@@ -51,7 +51,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#aaaaaa"
+        android:background="#000000"
         android:importantForAccessibility="no"
         android:contentDescription="@null" />
     <ListView
