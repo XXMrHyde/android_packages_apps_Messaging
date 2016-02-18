@@ -879,7 +879,8 @@ public abstract class MessageNotificationState extends NotificationState {
                                 convMessageData.getSenderProfilePhotoUri(),
                                 convMessageData.getSenderFullName(),
                                 convMessageData.getSenderNormalizedDestination(),
-                                convMessageData.getSenderContactLookupKey());
+                                convMessageData.getSenderContactLookupKey(),
+                                true);
                         currConvInfo = new ConversationLineInfo(convId,
                                 convData.getIsGroup(),
                                 groupConversationName,

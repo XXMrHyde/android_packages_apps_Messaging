@@ -104,19 +104,31 @@ public class AvatarRequest extends UriImageRequest<AvatarRequestDescriptor> {
             }
 
             avatarType = AvatarUriUtil.getAvatarType(generatedUri);
-            if (AvatarUriUtil.TYPE_LETTER_TILE_URI.equals(avatarType)) {
+            if (AvatarUriUtil.TYPE_LETTER_ICON_URI.equals(avatarType)) {
                 final String name = AvatarUriUtil.getName(generatedUri);
-                bitmap = renderLetterTile(name, width, height);
+                bitmap = renderLetterTile(name, width, height, true);
+            } else if (AvatarUriUtil.TYPE_LETTER_TILE_URI.equals(avatarType)) {
+                final String name = AvatarUriUtil.getName(generatedUri);
+                bitmap = renderLetterTile(name, width, height, false);
+            } else if (AvatarUriUtil.TYPE_DEFAULT_ICON_URI.equals(avatarType)) {
+                bitmap = renderDefaultAvatar(width, height, true);
             } else {
-                bitmap = renderDefaultAvatar(width, height);
+                bitmap = renderDefaultAvatar(width, height, false);
             }
         }
         return new DecodedImageResource(getKey(), bitmap, orientation);
     }
 
-    private Bitmap renderDefaultAvatar(final int width, final int height) {
-        final Bitmap bitmap = getBitmapPool().createOrReuseBitmap(width, height,
-                getBackgroundColor());
+    private Bitmap renderDefaultAvatar(final int width, final int height,
+            final boolean isNotification) {
+        Bitmap bitmap;
+        if (isNotification) {
+            bitmap = getBitmapPool().createOrReuseBitmap(width, height);
+        } else {
+            bitmap = getBitmapPool().createOrReuseBitmap(width, height,
+                    getBackgroundColor());
+        }
+
         final Canvas canvas = new Canvas(bitmap);
 
         if (sDefaultPersonBitmap == null) {
@@ -153,12 +165,18 @@ public class AvatarRequest extends UriImageRequest<AvatarRequestDescriptor> {
         return bitmap;
     }
 
-    private Bitmap renderLetterTile(final String name, final int width, final int height) {
+    private Bitmap renderLetterTile(final String name, final int width, final int height,
+            final boolean isNotification) {
         final float halfWidth = width / 2;
         final float halfHeight = height / 2;
         final int minOfWidthAndHeight = Math.min(width, height);
-        final Bitmap bitmap = getBitmapPool().createOrReuseBitmap(width, height,
-                getBackgroundColor());
+        Bitmap bitmap;
+        if (isNotification) {
+            bitmap = getBitmapPool().createOrReuseBitmap(width, height);
+        } else {
+            bitmap = getBitmapPool().createOrReuseBitmap(width, height,
+                    getBackgroundColor());
+        }
         final Resources resources = mContext.getResources();
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));

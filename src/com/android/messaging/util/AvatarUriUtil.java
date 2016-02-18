@@ -65,8 +65,10 @@ public class AvatarUriUtil {
 
     public static final String TYPE_GROUP_URI = "g";
     public static final String TYPE_LOCAL_RESOURCE_URI = "r";
-    public static final String TYPE_LETTER_TILE_URI = "l";
+    public static final String TYPE_LETTER_TILE_URI = "lt";
+    public static final String TYPE_LETTER_ICON_URI = "li";
     public static final String TYPE_DEFAULT_URI = "d";
+    public static final String TYPE_DEFAULT_ICON_URI = "di";
     public static final String TYPE_DEFAULT_BACKGROUND_URI = "b";
     public static final String TYPE_SIM_SELECTOR_URI = "s";
 
@@ -160,13 +162,22 @@ public class AvatarUriUtil {
      */
     public static Uri createAvatarUri(final Uri profilePhotoUri, final CharSequence name,
             final String defaultIdentifier, final String contactLookupKey) {
+        return createAvatarUri(profilePhotoUri, name, defaultIdentifier, contactLookupKey, false);
+    }
+
+    /**
+     * Creates an avatar uri based on a the input data.
+     */
+    public static Uri createAvatarUri(final Uri profilePhotoUri, final CharSequence name,
+            final String defaultIdentifier, final String contactLookupKey,
+            final boolean isNotification) {
         Uri generatedUri;
         if (!TextUtils.isEmpty(name) && isValidFirstCharacter(name)) {
-            generatedUri = AvatarUriUtil.fromName(name, contactLookupKey);
+            generatedUri = AvatarUriUtil.fromName(name, contactLookupKey, isNotification);
         } else {
             final String identifier = TextUtils.isEmpty(contactLookupKey)
                     ? defaultIdentifier : contactLookupKey;
-            generatedUri = AvatarUriUtil.fromIdentifier(identifier);
+            generatedUri = AvatarUriUtil.fromIdentifier(identifier, isNotification);
         }
 
         if (profilePhotoUri != null) {
@@ -241,12 +252,13 @@ public class AvatarUriUtil {
         return builder.build();
     }
 
-    private static Uri fromName(@NonNull final CharSequence name, final String contactLookupKey) {
+    private static Uri fromName(@NonNull final CharSequence name, final String contactLookupKey,
+            final boolean isNotification) {
         Assert.notNull(name);
         final Builder builder = new Builder();
         builder.scheme(SCHEME);
         builder.authority(AUTHORITY);
-        builder.appendPath(TYPE_LETTER_TILE_URI);
+        builder.appendPath(isNotification ? TYPE_LETTER_ICON_URI : TYPE_LETTER_TILE_URI);
         final String nameString = String.valueOf(name);
         builder.appendQueryParameter(PARAM_NAME, nameString);
         final String identifier =
@@ -255,11 +267,11 @@ public class AvatarUriUtil {
         return builder.build();
     }
 
-    private static Uri fromIdentifier(@NonNull final String identifier) {
+    private static Uri fromIdentifier(@NonNull final String identifier, final boolean isNotification) {
         final Builder builder = new Builder();
         builder.scheme(SCHEME);
         builder.authority(AUTHORITY);
-        builder.appendPath(TYPE_DEFAULT_URI);
+        builder.appendPath(isNotification ? TYPE_DEFAULT_ICON_URI :  TYPE_DEFAULT_URI);
         builder.appendQueryParameter(PARAM_IDENTIFIER, identifier);
         return builder.build();
     }
